@@ -1,0 +1,15 @@
+body {
+    background-color: lightblue;
+}
+
+.wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.maincanvas {
+    margin: 20px;
+    border-width: 2px;
+    border-style: dotted;
+    border-color: darkblue;
+}
