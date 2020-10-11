@@ -10,10 +10,11 @@ var branchOffAngleDNA = {name:"Branch angle",description:"The angle with which a
 var branchThicknessDNA = {name:"Branch thickness",description:"The thickness of the branch",valueOld:50,valueNew:0,delta:0}
 var branchTaperDNA = {name:"Branch taper",description:"The amount of taper each branch will do",valueOld:80,valueNew:0,delta:0}
 var branchOffThicknessDNA = {name:"Branch off thickness",description:"The relative thickness of a branch that branches off compared to its parent",valueOld:50,valueNew:0,delta:0}
-var leafDNA = {name:"Change of leaf",description:"The chance a branch will have a leaf on it",valueOld:50,valueNew:0,delta:0}
-var leafThicknessDNA = {name:"Leaf thickness",description:"The chance a branch will have a leaf on it",valueOld:50,valueNew:0,delta:0}
-var leafLengthDNA = {name:"Leaf length",description:"The chance a branch will have a leaf on it",valueOld:50,valueNew:0,delta:0}
+var leafDNA = {name:"Change of leaf",description:"The chance a branch will have a leaf on it",valueOld:30,valueNew:0,delta:0}
+var leafThicknessDNA = {name:"Leaf thickness",description:"The chance a branch will have a leaf on it",valueOld:30,valueNew:0,delta:0}
+var leafLengthDNA = {name:"Leaf length",description:"The chance a branch will have a leaf on it",valueOld:30,valueNew:0,delta:0}
 var leafCanopyDNA = {name:"Leaf canopy",description:"The tendency of leafes to be focussed near the end of branches",valueOld:50,valueNew:0,delta:0}
+var leafAngleDNA = {name:"Leaf angle",description:"The angle with which a leaf is sprouted, measured from the branch",valueOld:50,valueNew:0,delta:0}
 
 var DNA = [];
 
@@ -29,6 +30,7 @@ DNA.push(this.leafDNA);
 DNA.push(this.leafThicknessDNA);
 DNA.push(this.leafLengthDNA);
 DNA.push(this.leafCanopyDNA);
+DNA.push(this.leafAngleDNA);
 
 
 // Create the model

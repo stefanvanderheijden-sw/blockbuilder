@@ -1,6 +1,6 @@
 class plant {
     constructor(number,DNA) {
-        this.width = 500;
+        this.width = 450;
         this.height = 500;
         this.number = number;
         this.svgns = "http://www.w3.org/2000/svg"
@@ -19,9 +19,10 @@ class plant {
 
         // this.context = this.canvas.getContext('2d');
 
-        this.grassColor = '#91c4b2';
-        this.potColor = '#c2956c';
-        this.branchColor = '#86592e'; 
+        this.grassColor = '#83c590';
+        this.potColor = '#f9af71';
+        this.branchColor = '#686154'; 
+        this.leafColor = '#69a055';
 
         this.stamina = 200;
         this.DNA = DNA;
@@ -53,7 +54,7 @@ class plant {
 
         this.geneticErrors();
         this.displayDNA(this.plantbox);
-        this.drawGround();
+        // this.drawGround();
         this.drawPot();
 
         this.startTree();
@@ -72,12 +73,13 @@ class plant {
         this.leafThicknessDNA = fullDNA[9];
         this.leafLengthDNA = fullDNA[10];
         this.leafCanopyDNA = fullDNA[11];
+        this.leafAngleDNA = fullDNA[12];
 
     }
 
     geneticErrors() {
         this.DNA.forEach(function(DNASAMPLE) {
-            var rand = (-0.5+Math.random())*2;
+            var rand = (-0.5+Math.random())*5;
             DNASAMPLE.valueNew = DNASAMPLE.valueOld + rand;
             if (DNASAMPLE.valueNew > 100) {
                 DNASAMPLE.valueNew = 100;
@@ -160,21 +162,24 @@ class plant {
 
     leaf(x,y,length,angle,thickness) {
         if (this.stamina > 0 ) {
-            var leafWidth = (0.75 + (Math.random()/2)) * (this.leafThicknessDNA.valueNew)/5
-            var leafLength = (0.75 + (Math.random()/2)) * this.leafLengthDNA.valueNew/3
+            // var leafWidth = (0.75 + (Math.random()/2)) * (this.leafThicknessDNA.valueNew/2)
+            // var leafLength = (0.75 + (Math.random()/2)) * (this.leafLengthDNA.valueNew/2)
+
+            var leafWidth = this.leafThicknessDNA.valueNew/3
+            var leafLength = this.leafLengthDNA.valueNew/2
 
             var leafLeft = document.createElementNS(this.svgns, 'path');
             leafLeft.setAttributeNS(null, 'd', "M 0 0 Q "+leafLength/2+" "+leafWidth+" "+leafLength+" 0" )
             leafLeft.setAttributeNS(null, 'class', "GrowPlant"+this.number);
-            leafLeft.setAttributeNS(null, 'fill','green');
+            leafLeft.setAttributeNS(null, 'fill',this.leafColor);
             leafLeft.setAttributeNS(null, 'transform', this.translate(x,y) + this.rotate(angle));
-            leafLeft.setAttributeNS(null,'fill-opacity' , 0.5);
+            leafLeft.setAttributeNS(null,'fill-opacity' , 0.7);
             var leafRight = document.createElementNS(this.svgns, 'path');
             leafRight.setAttributeNS(null, 'd', "M 0 0 Q "+leafLength/2+" "+-leafWidth+" "+leafLength+" 0" )
             leafRight.setAttributeNS(null, 'class', "GrowPlant"+this.number);
-            leafRight.setAttributeNS(null, 'fill','green');
+            leafRight.setAttributeNS(null, 'fill',this.leafColor);
             leafRight.setAttributeNS(null, 'transform', this.translate(x,y) + this.rotate(angle));
-            leafRight.setAttributeNS(null,'fill-opacity' , 0.5);
+            leafRight.setAttributeNS(null,'fill-opacity' , 0.7);
             this.svg.appendChild(leafLeft);
             this.svg.appendChild(leafRight);
             this.stamina -= 1;
@@ -285,10 +290,12 @@ class plant {
                 if (thickness < startThickness) {
                     // The chance of leafing depends on the remaining number of branch segments
                     if (this.takeChance((numberOfLeaves/(qty - q)))) {
+                        var leafAngle = ((this.leafAngleDNA.valueNew/50)*45)+(-10+(Math.random()*20));
+
                         if (Math.random() > 0.5) {
-                            this.leaf(x,y,10,angle+90,thickness);
+                            this.leaf(x,y,10,angle+leafAngle,thickness);
                         } else {
-                            this.leaf(x,y,10,angle-90,thickness);
+                            this.leaf(x,y,10,angle-leafAngle,thickness);
                         }
                     }
                 }
