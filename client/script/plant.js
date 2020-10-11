@@ -34,6 +34,7 @@ class plant {
         this.leafDNA = {name:"Change of leaf",description:"The chance a branch will have a leaf on it",valueOld:50,valueNew:0}
         this.leafThicknessDNA = {name:"Leaf thickness",description:"The chance a branch will have a leaf on it",valueOld:50,valueNew:0}
         this.leafLengthDNA = {name:"Leaf length",description:"The chance a branch will have a leaf on it",valueOld:50,valueNew:0}
+        this.leafCanopyDNA = {name:"Leaf canopy",description:"The tendency of leafes to be focussed near the end of branches",valueOld:100,valueNew:0}
 
         this.DNA = [];
 
@@ -46,6 +47,7 @@ class plant {
         this.DNA.push(this.leafDNA);
         this.DNA.push(this.leafThicknessDNA);
         this.DNA.push(this.leafLengthDNA);
+        this.DNA.push(this.leafCanopyDNA);
 
         this.DNATable = document.createElement("TABLE");
         this.DNATable.className = "cinereousTable";
@@ -160,6 +162,7 @@ class plant {
             this.svg.appendChild(leafLeft);
             this.svg.appendChild(leafRight);
             this.stamina -= 1;
+
         }
     }
 
@@ -170,7 +173,6 @@ class plant {
         pot.setAttributeNS(null, 'fill', this.potColor);
         pot.setAttributeNS(null, 'transform', this.translate((this.width/2),this.height*0.9));
         this.svg.appendChild(pot);
-        
     }
 
     toRadians (angle) {
@@ -209,23 +211,35 @@ class plant {
         //The qty of branch parts should be taken into account (the length)
 
         //The basic DNA value is 50. This should lead to average one branch.
-        var numberOfBranches = (this.branchOffDNA.valueNew / 50)
+        var numberOfBranches = (this.branchOffDNA.valueNew / 25)
+        // numberOfBranches += (-1 + (Math.random()*2))
+        numberOfBranches = Math.round(numberOfBranches)
+        // console.log(numberOfBranches);
+        var branchArray = [];
+        var p = 0;
+        for (p = 0; p < numberOfBranches; p++) {
+            // console.log(p)
+            branchArray.push(Math.round((tempQty/numberOfBranches)*(1+p)));
+            console.log(branchArray[p]);
+          }
 
         //Every segment has a fraction of a chance of a branch, depending on the length of the branch and the branches per branch
         var branchChancePerSegment = (numberOfBranches / tempQty)
 
-
+        var self = this;
+        var lastLeaf = 0;
 
 
         for (q = 0; q < qty; q++) {
             if (this.stamina > 0) {
 
-                numberOfBranches = (this.branchOffDNA.valueNew / 50)
-                branchChancePerSegment = (numberOfBranches / tempQty)
-                tempQty --;
+
+                // branchChancePerSegment = (numberOfBranches / tempQty)
+                // tempQty -= 1;
 
                 this.branch(x,y,length,angle,thickness);
-                thickness -= 2*(thickness/qty);
+                thickness -= 1*(thickness/qty);
+
                 // if (thickness < 2) {
                 //     this.stamina += 2;
                 //     this.leaf(x,y,10,angle,thickness);
@@ -239,35 +253,50 @@ class plant {
 
                 // Adjust the angle randomly towards the sun using its sun lover DNA
                 deltaA = 270 - angle;
-                correction = ((deltaA/700) * (this.sunLoverDNA.valueNew));
+                correction = ((deltaA/200) * (this.sunLoverDNA.valueNew));
                 angle += correction;
 
                 // Roll the dice to see if this branch will branch off
                 // The branch should be created inside a branch
 
 
-                if (this.takeChance(branchChancePerSegment)) {
-                    // numberOfBranches --;
-                    var branchOffAngle = Math.random() * (this.branchOffAngleDNA.valueNew*1.2);
-                    if (Math.random() > 0.5) {
-                        branchOffAngle = -branchOffAngle;
-                    }
+                // if (this.takeChance(branchChancePerSegment)) {
+                //     // numberOfBranches --;
+                //     var branchOffAngle = Math.random() * (this.branchOffAngleDNA.valueNew*1.2);
+                //     if (Math.random() > 0.5) {
+                //         branchOffAngle = -branchOffAngle;
+                //     }
 
-                    branchOffAngle += angle;
+                //     branchOffAngle += angle;
+                //     this.growBranch(x,y,7,branchOffAngle,thickness,parseInt((thickness*this.branchLengthDNA.valueNew)/10));
+                // }
 
-                    this.growBranch(x,y,7,branchOffAngle,thickness,parseInt((thickness*this.branchLengthDNA.valueNew)/10));
-                }
+                branchArray.forEach(function(number) {
+                    if (q == number) {
+                        var branchOffAngle = self.branchOffAngleDNA.valueNew*1.2;
+                        if (Math.random() > 0.5) {
+                            branchOffAngle = -branchOffAngle;
+                        }
+
+                        branchOffAngle += angle;
+                        self.growBranch(x,y,7,branchOffAngle,thickness,parseInt((thickness*self.branchLengthDNA.valueNew)/10));
+                        }
+                    });
 
                 // Roll the dice to see if this branch will have a leaf
+                
                 var randomLeaf = Math.random();
                 randomLeaf *= (this.leafDNA.valueNew);
-                if (randomLeaf > 45) {
+                lastLeaf ++;
+                
+                // lastLeaf += 1 + ((this.leafCanopyDNA.valueNew/10)*(100*Math.pow(1/(qty - q),4)))
+                if (lastLeaf > (this.leafDNA.valueNew/10)) {
                     if (Math.random() > 0.5) {
                         this.leaf(x,y,10,angle+90,thickness);
                     } else {
                         this.leaf(x,y,10,angle-90,thickness);
                     }
-
+                    lastLeaf = 0;
                 }
 
                 await this.sleep(10);
@@ -312,7 +341,6 @@ class plant {
     getDNA(){
         var winningDNAValues = [];
         this.DNA.forEach(function(DNA) {
-            console.log("Adding a DNA to the set")
             winningDNAValues.push(DNA.valueNew);
         })
         return winningDNAValues;
@@ -320,7 +348,6 @@ class plant {
 
     passGenes(){
         var button = this.id;
-        console.log(button);
         var chosenPlantDNA = window.plants[button].getDNA();
 
         window.plants.forEach(function(plant) {
