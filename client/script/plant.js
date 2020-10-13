@@ -75,6 +75,11 @@ class plant {
         this.leafLengthDNA = fullDNA[10];
         this.leafCanopyDNA = fullDNA[11];
         this.leafAngleDNA = fullDNA[12];
+        this.blossomDNA = fullDNA[13];
+        this.blossomLeafsDNA = fullDNA[14];
+        this.blossomSpreadDNA = fullDNA[15];
+        this.blossomLengthDNA = fullDNA[16];
+        this.blossomThicknessDNA = fullDNA[17];
 
     }
 
@@ -188,16 +193,19 @@ class plant {
     }
 
     blossom(x,y,angle,blossomQty) {
-        var blossomQty = 5;
-        var spread = 180;
-        var length = 30;
-        var thickness = 10;
-        var t = 0;
-        for (t = 0; t < blossomQty; t++) {
-            // var leafAngle = ((spread/(blossomQty)*(t+1))-(spread/2));
-            var leafAngle = spread * (blossomQty/2);
-            this.leaf(x,y,length,angle+leafAngle,thickness,this.blossomcolor);
-          }
+        var blossomQty = Math.round(1+(this.blossomDNA.valueNew/10));
+        var spread = (this.blossomSpreadDNA.valueNew*3.6);
+        var length = (5+this.blossomLengthDNA.valueNew/5);
+        var thickness = (5+this.blossomThicknessDNA.valueNew/10);
+        
+        var angleBetween = (spread/blossomQty)/2
+        var currentAngle = angle-(spread/2)+angleBetween;
+        var h = 0;
+        for (let h = 0; h < blossomQty; h++) {
+            console.log('drawing a side leaf')
+            this.leaf(x,y,length,currentAngle,thickness,this.blossomcolor);
+            currentAngle += 2*angleBetween+(-5+(Math.random()*10));
+        }
     }
 
     drawPot() {
