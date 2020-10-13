@@ -23,6 +23,7 @@ class plant {
         this.potColor = '#f9af71';
         this.branchColor = '#686154'; 
         this.leafColor = '#69a055';
+        this.blossomcolor = '#f68fe0'
 
         this.stamina = 200;
         this.DNA = DNA;
@@ -160,31 +161,43 @@ class plant {
         this.svg.appendChild(branch);
     } 
 
-    leaf(x,y,length,angle,thickness) {
+    leaf(x,y,length,angle,thickness,color) {
         if (this.stamina > 0 ) {
             // var leafWidth = (0.75 + (Math.random()/2)) * (this.leafThicknessDNA.valueNew/2)
             // var leafLength = (0.75 + (Math.random()/2)) * (this.leafLengthDNA.valueNew/2)
 
-            var leafWidth = this.leafThicknessDNA.valueNew/3
-            var leafLength = this.leafLengthDNA.valueNew/2
+            var leafWidth = thickness;
+            var leafLength = length;
 
             var leafLeft = document.createElementNS(this.svgns, 'path');
             leafLeft.setAttributeNS(null, 'd', "M 0 0 Q "+leafLength/2+" "+leafWidth+" "+leafLength+" 0" )
             leafLeft.setAttributeNS(null, 'class', "GrowPlant"+this.number);
-            leafLeft.setAttributeNS(null, 'fill',this.leafColor);
+            leafLeft.setAttributeNS(null, 'fill',color);
             leafLeft.setAttributeNS(null, 'transform', this.translate(x,y) + this.rotate(angle));
             leafLeft.setAttributeNS(null,'fill-opacity' , 0.7);
             var leafRight = document.createElementNS(this.svgns, 'path');
             leafRight.setAttributeNS(null, 'd', "M 0 0 Q "+leafLength/2+" "+-leafWidth+" "+leafLength+" 0" )
             leafRight.setAttributeNS(null, 'class', "GrowPlant"+this.number);
-            leafRight.setAttributeNS(null, 'fill',this.leafColor);
+            leafRight.setAttributeNS(null, 'fill',color);
             leafRight.setAttributeNS(null, 'transform', this.translate(x,y) + this.rotate(angle));
             leafRight.setAttributeNS(null,'fill-opacity' , 0.7);
             this.svg.appendChild(leafLeft);
             this.svg.appendChild(leafRight);
             this.stamina -= 1;
-
         }
+    }
+
+    blossom(x,y,angle,blossomQty) {
+        var blossomQty = 5;
+        var spread = 180;
+        var length = 30;
+        var thickness = 10;
+        var t = 0;
+        for (t = 0; t < blossomQty; t++) {
+            // var leafAngle = ((spread/(blossomQty)*(t+1))-(spread/2));
+            var leafAngle = spread * (blossomQty/2);
+            this.leaf(x,y,length,angle+leafAngle,thickness,this.blossomcolor);
+          }
     }
 
     drawPot() {
@@ -293,9 +306,9 @@ class plant {
                         var leafAngle = ((this.leafAngleDNA.valueNew/50)*45)+(-10+(Math.random()*20));
 
                         if (Math.random() > 0.5) {
-                            this.leaf(x,y,10,angle+leafAngle,thickness);
+                            this.leaf(x,y,this.leafLengthDNA.valueNew/2,angle+leafAngle,this.leafThicknessDNA.valueNew/3,this.leafColor);
                         } else {
-                            this.leaf(x,y,10,angle-leafAngle,thickness);
+                            this.leaf(x,y,this.leafLengthDNA.valueNew/2,angle-leafAngle,this.leafThicknessDNA.valueNew/3,this.leafColor);
                         }
                     }
                 }
@@ -306,17 +319,18 @@ class plant {
                 // At the end of every branch, make a leaf
                 if (q > qty-1) {
                     if (thickness < startThickness) {
-                        console.log("End of branch!")
+                        console.log("End of branch!");
                         this.stamina += 2;
-                        this.leaf(x,y,10,angle,thickness);
+                        this.blossom(x,y,angle,2);
+                        // this.leaf(x,y,this.leafLengthDNA.valueNew/2,angle,this.leafThicknessDNA.valueNew/3,this.leafColor);
                     }
                 }
             }
             else {
                 if (thickness < startThickness) {
-                    console.log("End of branch!")
+                    console.log("End of branch!");
                     this.stamina += 2;
-                    this.leaf(x,y,10,angle,thickness);
+                    this.leaf(x,y,10,angle,thickness,this.leafColor);
                 }
                 return;
             }
