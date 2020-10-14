@@ -4,6 +4,7 @@ class plant {
         this.height = 500;
         this.number = number;
         this.svgns = "http://www.w3.org/2000/svg"
+        this.blossoms = 0;
 
         this.plantbox = document.createElement("div");
         this.plantbox.className = "plantbox";
@@ -29,6 +30,24 @@ class plant {
         this.DNA = DNA;
         this.updateFullDNA(this.DNA);
 
+        this.button = document.createElement('input');
+        this.button.setAttribute('type','button');
+        this.button.setAttribute('id',number);
+        this.button.setAttribute('value', 'Regrow');
+        this.button.className = "myButton";
+        // this.button.onclick = this.passGenes;
+        this.button.onclick = this.regrow;
+        this.plantbox.appendChild(this.button);
+        
+        this.geneticErrors();
+        // this.createDNATable();
+        // this.displayDNA(this.plantbox);
+        // this.drawGround();
+        this.drawPot();
+        this.startTree();
+    }
+
+    createDNATable() {
         this.DNATable = document.createElement("TABLE");
         this.DNATable.className = "cinereousTable";
         var firstRow = this.DNATable.insertRow();
@@ -44,21 +63,7 @@ class plant {
         var newDNA = firstRow.insertCell(3);
         newDNA.innerHTML = "<b>New DNA</b>";
 
-        this.button = document.createElement('input');
-        this.button.setAttribute('type','button');
-        this.button.setAttribute('id',number);
-        this.button.setAttribute('value', 'Share genes');
-        this.button.className = "myButton";
-        this.button.onclick = this.passGenes;
-        this.plantbox.appendChild(this.button);
         this.plantbox.appendChild(this.DNATable);
-
-        this.geneticErrors();
-        this.displayDNA(this.plantbox);
-        // this.drawGround();
-        this.drawPot();
-
-        this.startTree();
     }
 
     updateFullDNA(fullDNA) {
@@ -85,7 +90,7 @@ class plant {
 
     geneticErrors() {
         this.DNA.forEach(function(DNASAMPLE) {
-            var rand = (-0.5+Math.random())*5;
+            var rand = (-0.5+Math.random())*0;
             DNASAMPLE.valueNew = DNASAMPLE.valueOld + rand;
             if (DNASAMPLE.valueNew > 100) {
                 DNASAMPLE.valueNew = 100;
@@ -166,7 +171,8 @@ class plant {
         this.svg.appendChild(branch);
     } 
 
-    leaf(x,y,length,angle,thickness,color) {
+    async leaf(x,y,length,angle,thickness,color,alpha) {
+        await this.sleep(200);
         if (this.stamina > 0 ) {
             // var leafWidth = (0.75 + (Math.random()/2)) * (this.leafThicknessDNA.valueNew/2)
             // var leafLength = (0.75 + (Math.random()/2)) * (this.leafLengthDNA.valueNew/2)
@@ -179,33 +185,44 @@ class plant {
             leafLeft.setAttributeNS(null, 'class', "GrowPlant"+this.number);
             leafLeft.setAttributeNS(null, 'fill',color);
             leafLeft.setAttributeNS(null, 'transform', this.translate(x,y) + this.rotate(angle));
-            leafLeft.setAttributeNS(null,'fill-opacity' , 0.7);
+            leafLeft.setAttributeNS(null,'fill-opacity' , alpha);
             var leafRight = document.createElementNS(this.svgns, 'path');
             leafRight.setAttributeNS(null, 'd', "M 0 0 Q "+leafLength/2+" "+-leafWidth+" "+leafLength+" 0" )
             leafRight.setAttributeNS(null, 'class', "GrowPlant"+this.number);
             leafRight.setAttributeNS(null, 'fill',color);
             leafRight.setAttributeNS(null, 'transform', this.translate(x,y) + this.rotate(angle));
-            leafRight.setAttributeNS(null,'fill-opacity' , 0.7);
+            leafRight.setAttributeNS(null,'fill-opacity' , alpha);
             this.svg.appendChild(leafLeft);
             this.svg.appendChild(leafRight);
             this.stamina -= 1;
         }
     }
 
-    blossom(x,y,angle,blossomQty) {
-        var blossomQty = Math.round(1+(this.blossomDNA.valueNew/10));
-        var spread = (this.blossomSpreadDNA.valueNew*3.6);
-        var length = (5+this.blossomLengthDNA.valueNew/5);
-        var thickness = (5+this.blossomThicknessDNA.valueNew/10);
-        
-        var angleBetween = (spread/blossomQty)/2
-        var currentAngle = angle-(spread/2)+angleBetween;
-        var h = 0;
-        for (let h = 0; h < blossomQty; h++) {
-            console.log('drawing a side leaf')
-            this.leaf(x,y,length,currentAngle,thickness,this.blossomcolor);
-            currentAngle += 2*angleBetween+(-5+(Math.random()*10));
+    async blossom(x,y,angle,blossomQty,thickness) {
+        this.blossoms += 1;
+        await this.sleep(300);
+        if (this.takeChance((this.blossomDNA.valueNew/25)/(this.blossoms)) == true) 
+            {
+            this.branch(x,y,6,angle,thickness)
+            x += 6 *Math.cos(this.toRadians(angle));
+            y += 6 *Math.sin(this.toRadians(angle));
+
+            var blossomQty = Math.round(1+(this.blossomLeafsDNA.valueNew/10));
+            var spread = (this.blossomSpreadDNA.valueNew*3.6);
+            var length = (5+this.blossomLengthDNA.valueNew/5);
+            var thickness = (5+this.blossomThicknessDNA.valueNew/7);
+            
+            var angleBetween = (spread/blossomQty)/2
+            var currentAngle = angle-(spread/2)+angleBetween;
+            var h = 0;
+            for (let h = 0; h < blossomQty; h++) {
+                console.log('drawing a side leaf')
+                this.leaf(x,y,length,currentAngle,thickness,this.blossomcolor,0.7);
+                currentAngle += 2*angleBetween+(-5+(Math.random()*10));
+            }
+            
         }
+        this.blossoms --;
     }
 
     drawPot() {
@@ -230,6 +247,10 @@ class plant {
 
         this.drawPot();
     }
+
+    getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+      }
 
     takeChance(fraction) {
         var sides = (Math.pow(fraction, -1))
@@ -267,11 +288,16 @@ class plant {
 
         // When the branch is created, calculate the number of leaves on the branch
         var numberOfLeaves = Math.round((this.leafDNA.valueNew/10));
+        // var numberOfBlossom = Math.round((this.blossomDNA.valueNew/25));
+        var numberOfBlossom = Math.round(this.blossomDNA.valueNew/10);
 
         // Using the thickness of the initial branch and the canopy DNA, calculate the minimal thickness of a branch to start leaves
         var startThickness = ((100-this.leafCanopyDNA.valueNew)/100)*(this.branchThicknessDNA.valueNew/5);
 
         var q = 0;
+        var blossomArray = [];
+
+        var blossomArrayMade = false;
         for (q = 0; q < qty; q++) {
             if (this.stamina > 0) {
 
@@ -302,43 +328,68 @@ class plant {
                         }
 
                         branchOffAngle += angle;
-                        // self.growBranch(x,y,7,branchOffAngle,thickness,parseInt((thickness*self.branchLengthDNA.valueNew)/10));
                         self.growBranch(x,y,7,branchOffAngle,(((self.branchOffThicknessDNA.valueNew)/100)*thickness),((self.branchOffThicknessDNA.valueNew)/100)*remainingLength);
                         }
                     });
 
                 // Check to see if the branch is thin enough to start leafing
                 if (thickness < startThickness) {
+                    if (blossomArrayMade == false) {
+                        var numberOfSegmentsLeft = qty - q;
+                        
+                        for (let t = 0; t < numberOfBlossom; t++) {
+                            blossomArray.push(self.getRandomInt(numberOfSegmentsLeft)+q);                      
+                        }
+                        blossomArrayMade = true;
+                    }
+
                     // The chance of leafing depends on the remaining number of branch segments
                     if (this.takeChance((numberOfLeaves/(qty - q)))) {
                         var leafAngle = ((this.leafAngleDNA.valueNew/50)*45)+(-10+(Math.random()*20));
 
                         if (Math.random() > 0.5) {
-                            this.leaf(x,y,this.leafLengthDNA.valueNew/2,angle+leafAngle,this.leafThicknessDNA.valueNew/3,this.leafColor);
-                        } else {
-                            this.leaf(x,y,this.leafLengthDNA.valueNew/2,angle-leafAngle,this.leafThicknessDNA.valueNew/3,this.leafColor);
-                        }
+                            leafAngle = -leafAngle
+                        } 
+                            this.leaf(x,y,this.leafLengthDNA.valueNew/2,angle+leafAngle,this.leafThicknessDNA.valueNew/3,this.leafColor,0.7);
+
                     }
                 }
 
+                blossomArray.forEach(function(blossomPosition) {
+                    if (q == blossomPosition) {
+                        var leafAngle = ((self.leafAngleDNA.valueNew/50)*45)+(-10+(Math.random()*20));
+                        if (Math.random() > 0.5) {
+                            self.blossom(x,y,angle+leafAngle,2,thickness);
+                        } else {
+                            self.blossom(x,y,angle-leafAngle,2,thickness);
+                        }
+                    }
+                })
+
                 this.stamina --;
-                await this.sleep(1);
+                await this.sleep(5);
 
                 // At the end of every branch, make a leaf
                 if (q > qty-1) {
                     if (thickness < startThickness) {
                         console.log("End of branch!");
-                        this.stamina += 2;
-                        this.blossom(x,y,angle,2);
-                        // this.leaf(x,y,this.leafLengthDNA.valueNew/2,angle,this.leafThicknessDNA.valueNew/3,this.leafColor);
+                        if (this.leafDNA.valueNew > 5) {
+                            this.stamina += 2;
+                            this.leaf(x,y,this.leafLengthDNA.valueNew/2,angle,this.leafThicknessDNA.valueNew/3,this.leafColor,0.7);
+                        }
                     }
                 }
+
+
+
             }
             else {
                 if (thickness < startThickness) {
                     console.log("End of branch!");
-                    this.stamina += 2;
-                    this.leaf(x,y,10,angle,thickness,this.leafColor);
+                    if (this.leafDNA.valueNew > 5) {
+                        this.stamina += 2;
+                        this.leaf(x,y,10,angle,thickness,this.leafColor);
+                    }
                 }
                 return;
             }
@@ -358,8 +409,8 @@ class plant {
             DNA.valueOld = newDNA[index];
         })
         this.geneticErrors();
-        this.resetDisplayDNA();
-        this.displayDNA();
+        // this.resetDisplayDNA();
+        // this.displayDNA();
         this.resetPlant();
         this.stamina = 600;
         this.startTree();
@@ -384,5 +435,15 @@ class plant {
 
         window.DNA = window.plants[button].DNA;
         window.updateGeneticValues();
+    }
+
+    regrow(){
+        window.plants.forEach(function(plant) {
+            plant.blossoms = 0;
+            plant.resetPlant();
+            plant.stamina = 600;
+            plant.startTree();
+        });
+
     }
 }

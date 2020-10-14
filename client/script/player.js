@@ -5,7 +5,7 @@ var i = 0;
 var branchAngleDNA = {name:"Angle variance",description:"The variance of the angle between branch segments:",valueOld:50,valueNew:0,delta:0}
 var sunLoverDNA = {name:"Upwards tendency",description:"The drive this plant has to grow upwards",valueOld:50,valueNew:0,delta:0}
 var branchLengthDNA = {name:"Branch length",description:"The length each branch is given",valueOld:80,valueNew:0,delta:0}
-var branchOffDNA = {name:"Tendency to branch",description:"The likelyhood that a branch will be created",valueOld:0,valueNew:0,delta:0}
+var branchOffDNA = {name:"Tendency to branch",description:"The likelyhood that a branch will be created",valueOld:50,valueNew:0,delta:0}
 var branchOffAngleDNA = {name:"Branch angle",description:"The angle with which a branch angles off",valueOld:50,valueNew:0,delta:0}
 var branchThicknessDNA = {name:"Branch thickness",description:"The thickness of the branch",valueOld:50,valueNew:0,delta:0}
 var branchTaperDNA = {name:"Branch taper",description:"The amount of taper each branch will do",valueOld:80,valueNew:0,delta:0}
@@ -13,15 +13,13 @@ var branchOffThicknessDNA = {name:"Branch off thickness",description:"The relati
 var leafDNA = {name:"Chance of leaf",description:"The chance a branch will have a leaf on it",valueOld:0,valueNew:0,delta:0}
 var leafThicknessDNA = {name:"Leaf thickness",description:"The chance a branch will have a leaf on it",valueOld:30,valueNew:0,delta:0}
 var leafLengthDNA = {name:"Leaf length",description:"The chance a branch will have a leaf on it",valueOld:30,valueNew:0,delta:0}
-var leafCanopyDNA = {name:"Leaf canopy",description:"The tendency of leafes to be focussed near the end of branches",valueOld:50,valueNew:0,delta:0}
+var leafCanopyDNA = {name:"Canopy height",description:"The tendency of leafes to be focussed near the end of branches",valueOld:50,valueNew:0,delta:0}
 var leafAngleDNA = {name:"Leaf angle",description:"The angle with which a leaf is sprouted, measured from the branch",valueOld:50,valueNew:0,delta:0}
 var blossomDNA = {name:"Blossoms",description:"The amount of blossoms.",valueOld:50,valueNew:0,delta:0}
 var blossomLeafsDNA = {name:"Blossom leafs",description:"The amount of leafs each blossom has.",valueOld:50,valueNew:0,delta:0}
 var blossomSpreadDNA = {name:"Blossom spread",description:"The angle each blossom opens, from fully closed to full open circle.",valueOld:50,valueNew:0,delta:0}
 var blossomLengthDNA = {name:"Blossom length",description:"The length of each leaf of the blossom.",valueOld:50,valueNew:0,delta:0}
 var blossomThicknessDNA = {name:"Blossom thickness",description:"The thickness of each blossom leaf.",valueOld:50,valueNew:0,delta:0}
-
-
 
 var DNA = [];
 
