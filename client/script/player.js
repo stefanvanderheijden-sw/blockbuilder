@@ -1,21 +1,22 @@
 var nrOfPlants = 1;
 var plants = [];
 var i = 0;
+var plantNumber = 1;
 
 var branchAngleDNA = {name:"Angle variance",description:"The variance of the angle between branch segments:",valueOld:50,valueNew:0,delta:0}
 var sunLoverDNA = {name:"Upwards tendency",description:"The drive this plant has to grow upwards",valueOld:50,valueNew:0,delta:0}
-var branchLengthDNA = {name:"Branch length",description:"The length each branch is given",valueOld:80,valueNew:0,delta:0}
+var branchLengthDNA = {name:"Branch length",description:"The length each branch is given",valueOld:50,valueNew:0,delta:0}
 var branchOffDNA = {name:"Tendency to branch",description:"The likelyhood that a branch will be created",valueOld:50,valueNew:0,delta:0}
 var branchOffAngleDNA = {name:"Branch angle",description:"The angle with which a branch angles off",valueOld:50,valueNew:0,delta:0}
 var branchThicknessDNA = {name:"Branch thickness",description:"The thickness of the branch",valueOld:50,valueNew:0,delta:0}
-var branchTaperDNA = {name:"Branch taper",description:"The amount of taper each branch will do",valueOld:80,valueNew:0,delta:0}
+var branchTaperDNA = {name:"Branch taper",description:"The amount of taper each branch will do",valueOld:90,valueNew:0,delta:0}
 var branchOffThicknessDNA = {name:"Branch off thickness",description:"The relative thickness of a branch that branches off compared to its parent",valueOld:50,valueNew:0,delta:0}
-var leafDNA = {name:"Chance of leaf",description:"The chance a branch will have a leaf on it",valueOld:0,valueNew:0,delta:0}
-var leafThicknessDNA = {name:"Leaf thickness",description:"The chance a branch will have a leaf on it",valueOld:30,valueNew:0,delta:0}
-var leafLengthDNA = {name:"Leaf length",description:"The chance a branch will have a leaf on it",valueOld:30,valueNew:0,delta:0}
+var leafDNA = {name:"Chance of leaf",description:"The chance a branch will have a leaf on it",valueOld:50,valueNew:0,delta:0}
+var leafThicknessDNA = {name:"Leaf thickness",description:"The thickness of each leaf",valueOld:30,valueNew:0,delta:0}
+var leafLengthDNA = {name:"Leaf length",description:"The length of each leaf",valueOld:30,valueNew:0,delta:0}
 var leafCanopyDNA = {name:"Canopy height",description:"The tendency of leafes to be focussed near the end of branches",valueOld:50,valueNew:0,delta:0}
 var leafAngleDNA = {name:"Leaf angle",description:"The angle with which a leaf is sprouted, measured from the branch",valueOld:50,valueNew:0,delta:0}
-var blossomDNA = {name:"Blossoms",description:"The amount of blossoms.",valueOld:50,valueNew:0,delta:0}
+var blossomDNA = {name:"Blossoms",description:"The amount of blossoms.",valueOld:10,valueNew:0,delta:0}
 var blossomLeafsDNA = {name:"Blossom leafs",description:"The amount of leafs each blossom has.",valueOld:50,valueNew:0,delta:0}
 var blossomSpreadDNA = {name:"Blossom spread",description:"The angle each blossom opens, from fully closed to full open circle.",valueOld:50,valueNew:0,delta:0}
 var blossomLengthDNA = {name:"Blossom length",description:"The length of each leaf of the blossom.",valueOld:50,valueNew:0,delta:0}
@@ -41,7 +42,6 @@ DNA.push(this.blossomLeafsDNA);
 DNA.push(this.blossomSpreadDNA);
 DNA.push(this.blossomLengthDNA);
 DNA.push(this.blossomThicknessDNA);
-
 
 // Create the model
 var modal = document.getElementById("myModal");
@@ -136,8 +136,6 @@ function modifyDNA() {
     chosenDNAValues.push(DNA.valueOld);
   })
 
-
-
   plants.forEach(function(plant) {
     plant.setDNA(chosenDNAValues);
   })
@@ -149,3 +147,49 @@ function modifyDNA() {
 for (i = 0; i < nrOfPlants; i++) {
     plants.push(new plant(i,DNA));
   }
+
+function downloadIMG() {
+    var svgElement = plants[0].svg;
+    let svgBounding = svgElement.getBBox(); 
+    console.log("width of the BB " + svgBounding.width);
+    console.log("height of the BB " + svgBounding.height);
+    let clonedSvgElement = svgElement.cloneNode(true);
+    let outerHTML = clonedSvgElement.outerHTML;
+    blob = new Blob([outerHTML],{type:'image/svg+xml;charset=utf-8'});
+    let URL = window.URL || window.webkitURL || window;
+    let blobURL = URL.createObjectURL(blob);
+
+    let image = new Image();
+    image.src = blobURL;
+    
+    image.onload = function() {
+      let canvas = document.createElement('canvas');
+      canvas.width = svgBounding.width*3;
+      canvas.height = svgBounding.height*3;
+      let context = canvas.getContext('2d');
+      // draw image in canvas starting left-0 , top - 0  
+      context.drawImage(image, 0, 0, svgBounding.width*3, svgBounding.height*3 );
+      //  downloadImage(canvas); need to implement
+      let png = canvas.toDataURL(); // default png
+      download(png, "Plant_"+plantNumber+".png");
+      plantNumber ++;
+    };
+    
+    
+
+
+
+};
+
+var download = function(href, name){
+  var link = document.createElement('a');
+  link.download = name;
+  link.style.opacity = "0";
+  document.body.append(link);
+  link.href = href;
+  link.click();
+  link.remove();
+}
+
+let geneticButton = document.getElementById('setDNA');
+plants[0].buttonDrawer.appendChild(geneticButton);

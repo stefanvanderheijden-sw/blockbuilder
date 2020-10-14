@@ -1,7 +1,7 @@
 class plant {
     constructor(number,DNA) {
-        this.width = 450;
-        this.height = 500;
+        this.width = 350;
+        this.height = 600;
         this.number = number;
         this.svgns = "http://www.w3.org/2000/svg"
         this.blossoms = 0;
@@ -14,6 +14,18 @@ class plant {
         this.svg.setAttribute("width", this.width.toString());
         this.svg.setAttribute("height", this.height.toString());
 
+        this.buttonDrawer = document.createElement("div");
+        this.buttonDrawer.className = "buttonDrawer";
+
+        this.backgroundRect = document.createElementNS(this.svgns, 'rect');
+        this.backgroundRect.setAttributeNS(null, 'x', 0);
+        this.backgroundRect.setAttributeNS(null, 'y', 0);
+        this.backgroundRect.setAttributeNS(null, 'height', this.height);
+        this.backgroundRect.setAttributeNS(null, 'width', this.width);
+        this.backgroundRect.setAttributeNS(null, 'fill', 'white');
+
+        this.svg.appendChild(this.backgroundRect);
+
         const wrapper = document.getElementById("wrapper")
         wrapper.appendChild(this.plantbox); 
         this.plantbox.appendChild(this.svg);
@@ -21,8 +33,8 @@ class plant {
         // this.context = this.canvas.getContext('2d');
 
         this.grassColor = '#83c590';
-        this.potColor = '#f9af71';
-        this.branchColor = '#686154'; 
+        this.potColor = '#fab45e';
+        this.branchColor = '#656356'; 
         this.leafColor = '#69a055';
         this.blossomcolor = '#f68fe0'
 
@@ -37,7 +49,18 @@ class plant {
         this.button.className = "myButton";
         // this.button.onclick = this.passGenes;
         this.button.onclick = this.regrow;
-        this.plantbox.appendChild(this.button);
+
+        this.buttonDownload = document.createElement('input');
+        this.buttonDownload.setAttribute('type','button');
+        this.buttonDownload.setAttribute('value', 'Download');
+        this.buttonDownload.className = "myButton";
+        // this.button.onclick = this.passGenes;
+        this.buttonDownload.onclick = window.downloadIMG;
+        
+        this.buttonDrawer.appendChild(this.button);
+        this.buttonDrawer.appendChild(this.buttonDownload);
+
+        this.plantbox.appendChild(this.buttonDrawer);
         
         this.geneticErrors();
         // this.createDNATable();
@@ -199,6 +222,7 @@ class plant {
     }
 
     async blossom(x,y,angle,blossomQty,thickness) {
+        var alpha = 0.7;
         this.blossoms += 1;
         await this.sleep(300);
         if (this.takeChance((this.blossomDNA.valueNew/25)/(this.blossoms)) == true) 
@@ -216,6 +240,12 @@ class plant {
             var currentAngle = angle-(spread/2)+angleBetween;
             var h = 0;
             for (let h = 0; h < blossomQty; h++) {
+                if (this.takeChance(0.5)) {
+                    this.blossomcolor = '#e778ce'
+                } else {
+                    this.blossomcolor = '#f68fdf'
+                }
+                alpha = 0.4+(Math.random()/2);
                 console.log('drawing a side leaf')
                 this.leaf(x,y,length,currentAngle,thickness,this.blossomcolor,0.7);
                 currentAngle += 2*angleBetween+(-5+(Math.random()*10));
@@ -243,7 +273,7 @@ class plant {
       }
 
     startTree() {
-        this.growBranch((this.width/2),(this.height*0.84),7,270,(this.branchThicknessDNA.valueNew/5),this.branchLengthDNA.valueNew/2);
+        this.growBranch((this.width/2),(this.height*0.849),7,270,(this.branchThicknessDNA.valueNew/5),this.branchLengthDNA.valueNew/1.5);
 
         this.drawPot();
     }
@@ -300,6 +330,12 @@ class plant {
         var blossomArrayMade = false;
         for (q = 0; q < qty; q++) {
             if (this.stamina > 0) {
+                if (Math.random() > 0.5) {
+                    this.leafColor = '#5a854e'
+                } else {
+                    this.leafColor = '#769d57'
+                }
+
 
                 // Create a piece of branch
                 this.branch(x,y,length,angle,thickness);
